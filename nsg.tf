@@ -86,7 +86,7 @@ resource "azurerm_network_security_group" "testproject-vmss-subnet-nsg" {
     name                       = "AllowVirtualNetwork"
     priority                   = 1000
     direction                  = "Inbound"
-    access                     = "Deny"
+    access                     = "Allow"
     protocol                   = "*"
     source_address_prefix      = "VirtualNetwork"
     source_port_range          = "*"
