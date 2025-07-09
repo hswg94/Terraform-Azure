@@ -90,8 +90,8 @@ resource "azurerm_network_security_group" "testproject-vmss-subnet-nsg" {
     protocol                   = "*"
     source_address_prefix      = "VirtualNetwork"
     source_port_range          = "*"
-    destination_address_prefix = "3000"
-    destination_port_range     = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+    destination_port_range     = "3000"
   }
 
   security_rule {
