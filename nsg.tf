@@ -83,7 +83,7 @@ resource "azurerm_network_security_group" "testproject-vmss-subnet-nsg" {
   }
 
     security_rule {
-    name                       = "DenyAllInbound"
+    name                       = "AllowVirtualNetwork"
     priority                   = 1000
     direction                  = "Inbound"
     access                     = "Deny"
