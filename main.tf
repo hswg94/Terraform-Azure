@@ -25,3 +25,13 @@ resource "azurerm_subnet" "testproject-vmss-subnet" {
   virtual_network_name = azurerm_virtual_network.testproject-vnet.name
   address_prefixes     = ["10.0.2.0/24"]
 }
+
+resource "azurerm_subnet_network_security_group_association" "agw-nsg-association" {
+  subnet_id                 = azurerm_subnet.testproject-agw-subnet.id
+  network_security_group_id = azurerm_network_security_group.testproject-agw-subnet-nsg.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "vmss-nsg-association" {
+  subnet_id                 = azurerm_subnet.testproject-vmss-subnet.id
+  network_security_group_id = azurerm_network_security_group.testproject-vmss-subnet-nsg.id
+}

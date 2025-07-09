@@ -22,10 +22,10 @@ resource "azurerm_network_security_group" "testproject-agw-subnet-nsg" {
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
+    source_address_prefix      = "GatewayManager"
     source_port_range          = "*"
-    destination_port_range     = "65200-65535"
-    source_address_prefix      = "*"
     destination_address_prefix = "*"
+    destination_port_range     = "65200-65535"
   }
 
     security_rule {
@@ -34,7 +34,7 @@ resource "azurerm_network_security_group" "testproject-agw-subnet-nsg" {
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "*"
-    source_address_prefix      = "*"
+    source_address_prefix      = "AzureLoadBalancer"
     source_port_range          = "*"
     destination_address_prefix = "*"
     destination_port_range     = "*"
@@ -70,3 +70,4 @@ resource "azurerm_network_security_group" "testproject-vmss-subnet-nsg" {
     destination_address_prefix = azurerm_subnet.testproject-vmss-subnet.address_prefixes[0]
   }
 }
+
