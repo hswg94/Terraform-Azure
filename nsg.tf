@@ -68,42 +68,5 @@ resource "azurerm_network_security_group" "testproject-vmss-subnet-nsg" {
     destination_port_range     = "3000"
     source_address_prefix      = azurerm_subnet.testproject-agw-subnet.address_prefixes[0]
     destination_address_prefix = azurerm_subnet.testproject-vmss-subnet.address_prefixes[0]
-  }
-
-    security_rule {
-    name                       = "AllowAzureLoadBalancer"
-    priority                   = 200
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_address_prefix      = "AzureLoadBalancer"
-    source_port_range          = "*"
-    destination_address_prefix = "VirtualNetwork"
-    destination_port_range     = "*"
-  }
-
-    security_rule {
-    name                       = "AllowVirtualNetwork"
-    priority                   = 1000
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_address_prefix      = "VirtualNetwork"
-    source_port_range          = "*"
-    destination_address_prefix = "VirtualNetwork"
-    destination_port_range     = "3000"
-  }
-
-  security_rule {
-    name                       = "DenyAllInbound"
-    priority                   = 4096
-    direction                  = "Inbound"
-    access                     = "Deny"
-    protocol                   = "*"
-    source_address_prefix      = "*"
-    source_port_range          = "*"
-    destination_address_prefix = "*"
-    destination_port_range     = "*"
-  }
 }
 
