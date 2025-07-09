@@ -82,6 +82,18 @@ resource "azurerm_network_security_group" "testproject-vmss-subnet-nsg" {
     destination_port_range     = "*"
   }
 
+    security_rule {
+    name                       = "DenyAllInbound"
+    priority                   = 1000
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_address_prefix      = "VirtualNetwork"
+    source_port_range          = "*"
+    destination_address_prefix = "3000"
+    destination_port_range     = "VirtualNetwork"
+  }
+
   security_rule {
     name                       = "DenyAllInbound"
     priority                   = 4096
