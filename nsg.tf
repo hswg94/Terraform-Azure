@@ -11,7 +11,7 @@ resource "azurerm_network_security_group" "testproject-agw-subnet-nsg" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "443, 80"
+    destination_port_range     = [443, 80]
     source_address_prefix      = "*"
     destination_address_prefix = azurerm_subnet.testproject-agw-subnet.address_prefixes[0]
   }
