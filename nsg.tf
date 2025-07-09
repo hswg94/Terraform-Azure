@@ -1,0 +1,72 @@
+
+resource "azurerm_network_security_group" "testproject-agw-subnet-nsg" {
+  name                = "testproject-agw-subnet-nsg"
+  location            = azurerm_resource_group.testproject-rg.location
+  resource_group_name = azurerm_resource_group.testproject-rg.name
+
+  security_rule {
+    name                       = "AllowHTTPandHTTPS"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443, 80"
+    source_address_prefix      = "*"
+    destination_address_prefix = azurerm_subnet.testproject-agw-subnet.address_prefixes[0]
+  }
+
+  security_rule {
+    name                       = "AllowGatewayManager"
+    priority                   = 150
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "65200-65535"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+    security_rule {
+    name                       = "AllowAzureLoadBalancer"
+    priority                   = 200
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_address_prefix      = "*"
+    source_port_range          = "*"
+    destination_address_prefix = "*"
+    destination_port_range     = "*"
+  }
+
+    security_rule {
+    name                       = "DenyAllInbound"
+    priority                   = 250
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_address_prefix      = "*"
+    source_port_range          = "*"
+    destination_address_prefix = "*"
+    destination_port_range     = "*"
+  }
+}
+
+resource "azurerm_network_security_group" "testproject-vmss-subnet-nsg" {
+  name                = "testproject-vmss-subnet-nsg"
+  location            = azurerm_resource_group.testproject-rg.location
+  resource_group_name = azurerm_resource_group.testproject-rg.name
+
+  security_rule {
+    name                       = "AllowAppPort3000"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "3000"
+    source_address_prefix      = azurerm_subnet.testproject-agw-subnet.address_prefixes[0]
+    destination_address_prefix = azurerm_subnet.testproject-vmss-subnet.address_prefixes[0]
+  }
+}
