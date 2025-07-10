@@ -4,7 +4,7 @@ terraform {
   cloud {
     organization = "azure-project-org"
     workspaces {
-      name = "azure-project-workspace"
+      name = "Terraform-Azure"
     }
   }
   required_providers {
