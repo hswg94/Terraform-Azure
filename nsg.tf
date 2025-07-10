@@ -68,5 +68,5 @@ resource "azurerm_network_security_group" "testproject-vmss-subnet-nsg" {
     destination_port_range     = "3000"
     source_address_prefix      = azurerm_subnet.testproject-agw-subnet.address_prefixes[0]
     destination_address_prefix = azurerm_subnet.testproject-vmss-subnet.address_prefixes[0]
+  }
 }
-
