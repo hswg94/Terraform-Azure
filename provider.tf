@@ -1,12 +1,13 @@
 terraform {
   // when upgrading version, first run 'choco upgrade terraform' on OS.
   required_version = ">= 1.11.4"
-  cloud {
-    organization = "azure-project-org"
-    workspaces {
-      name = "Terraform-Azure"
-    }
-  }
+  # cloud {
+  #   organization = "azure-project-org"
+  #   workspaces {
+  #     name = "Terraform-Azure"
+  #   }
+  # }
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -18,6 +19,7 @@ terraform {
 # Configure the Microsoft Azure Provider
 provider "azurerm" {
   features {}
+  subscription_id = "b2280d34-bdac-433a-9e4a-46e23d06510f"
 }
 
 /*
