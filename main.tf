@@ -63,23 +63,4 @@ resource "azurerm_subnet" "testproject-mgmt-subnet" {
   default_outbound_access_enabled = false
 }
 
-# Network Security Group Associations
-resource "azurerm_subnet_network_security_group_association" "agw-nsg-association" {
-  subnet_id                 = azurerm_subnet.testproject-agw-subnet.id
-  network_security_group_id = azurerm_network_security_group.testproject-agw-subnet-nsg.id
-}
 
-resource "azurerm_subnet_network_security_group_association" "app-nsg-association" {
-  subnet_id                 = azurerm_subnet.testproject-app-subnet.id
-  network_security_group_id = azurerm_network_security_group.testproject-vmss-subnet-nsg.id
-}
-
-resource "azurerm_subnet_network_security_group_association" "db-nsg-association" {
-  subnet_id                 = azurerm_subnet.testproject-db-subnet.id
-  network_security_group_id = azurerm_network_security_group.testproject-db-subnet-nsg.id
-}
-
-resource "azurerm_subnet_network_security_group_association" "mgmt-nsg-association" {
-  subnet_id                 = azurerm_subnet.testproject-mgmt-subnet.id
-  network_security_group_id = azurerm_network_security_group.testproject-mgmt-subnet-nsg.id
-}
