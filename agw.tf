@@ -40,12 +40,7 @@ resource "azurerm_application_gateway" "testproject-agw" {
     max_capacity = 2
   }
 
-  waf_configuration {
-    enabled          = true
-    firewall_mode    = "Detection"
-    rule_set_type    = "OWASP"
-    rule_set_version = "3.2"
-  }
+  firewall_policy_id = azurerm_web_application_firewall_policy.ppl-uat-waf.id
 
   ssl_policy {
     policy_type          = "CustomV2"
@@ -60,10 +55,15 @@ resource "azurerm_application_gateway" "testproject-agw" {
 
   backend_address_pool {
     name = "simplicity-app"
+    # VMs will be automatically associated through their NICs or VMSS
+    # Alternatively, you can explicitly specify:
+    # ip_addresses = ["10.0.2.10", "10.0.2.11"]
+    # fqdns = ["vm1.domain.com", "vm2.domain.com"]
   }
 
   backend_address_pool {
     name = "empty"
+
   }
 
   //////// BACKEND SETTINGS ////////
@@ -168,11 +168,11 @@ resource "azurerm_application_gateway" "testproject-agw" {
   //////// END OF FRONTEND PORTS ////////
 
   //////// SSL CERTIFICATES ////////
-  ssl_certificate {
-    name     = "wildcard-anacle-com-2024-25"
-    data     = filebase64("path/to/your/certificate.pfx") # Update this path
-    password = "your_certificate_password"                # Update this password
-  }
+  # ssl_certificate {
+  #   name     = "wildcard-anacle-com-2024-25"
+  #   data     = filebase64("path/to/your/certificate.pfx") # Update this path
+  #   password = "your_certificate_password"                # Update this password
+  # }
   //////// END OF SSL CERTIFICATES ////////
 
   //////// LISTENERS ////////
