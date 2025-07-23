@@ -62,5 +62,3 @@ resource "azurerm_subnet" "testproject-mgmt-subnet" {
   # Disable default outbound access
   default_outbound_access_enabled = false
 }
-
-
