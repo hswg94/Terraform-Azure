@@ -40,7 +40,7 @@ resource "azurerm_application_gateway" "testproject-agw" {
     max_capacity = 2
   }
 
-  firewall_policy_id = azurerm_web_application_firewall_policy.ppl-uat-waf.id
+  firewall_policy_id = azurerm_web_application_firewall_policy.wafp-ppl-uatweb-apgw.id
 
   ssl_policy {
     policy_type          = "CustomV2"
