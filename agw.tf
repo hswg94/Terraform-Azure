@@ -87,7 +87,7 @@ resource "azurerm_application_gateway" "testproject-agw" {
   }
 
   backend_http_settings {
-    name                  = "sendapi-backend-settings"
+    name                  = "sendapi-backendsettings"
     protocol              = "Http"
     port                  = 80
     cookie_based_affinity = "Disabled"
@@ -225,7 +225,7 @@ resource "azurerm_application_gateway" "testproject-agw" {
     path_rule {
       paths                      = ["/sendapi/*"]
       name                       = "sendapi"
-      backend_http_settings_name = "sendapi-backend-settings"
+      backend_http_settings_name = "sendapi-backendsettings"
       backend_address_pool_name  = "simplicity-app"
       rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
     }
@@ -351,7 +351,6 @@ resource "azurerm_application_gateway" "testproject-agw" {
     unhealthy_threshold                       = 3
     pick_host_name_from_backend_http_settings = true
     minimum_servers                           = 0
-
     match {
       status_code = ["200-399"]
       body        = ""
@@ -390,5 +389,4 @@ resource "azurerm_application_gateway" "testproject-agw" {
     }
   }
   //////// END OF HEALTH PROBES ////////
-
 }
