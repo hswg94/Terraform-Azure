@@ -10,7 +10,7 @@
 # }
 
 resource "azurerm_public_ip" "testproject-agw-pip" {
-  name                = "testproject-agw-pip"
+  name                = "pip-ppl-uat-apgw01"
   resource_group_name = azurerm_resource_group.testproject-rg.name
   location            = azurerm_resource_group.testproject-rg.location
   allocation_method   = "Static"
@@ -20,11 +20,11 @@ resource "azurerm_public_ip" "testproject-agw-pip" {
 
 resource "azurerm_application_gateway" "testproject-agw" {
   gateway_ip_configuration {
-    name      = "my-gateway-ip-configuration"
+    name      = "appGatewayIpConfig"
     subnet_id = azurerm_subnet.testproject-agw-subnet.id
   }
 
-  name                = "testproject-agw"
+  name                = "apgw-ppl-uatweb-ag"
   resource_group_name = azurerm_resource_group.testproject-rg.name
   location            = azurerm_resource_group.testproject-rg.location
   enable_http2        = true
@@ -45,6 +45,17 @@ resource "azurerm_application_gateway" "testproject-agw" {
     firewall_mode    = "Detection"
     rule_set_type    = "OWASP"
     rule_set_version = "3.2"
+  }
+
+  ssl_policy {
+    policy_type          = "CustomV2"
+    min_protocol_version = "TLSv1_2"
+    cipher_suites = [
+      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+    ]
   }
 
   backend_address_pool {
@@ -193,34 +204,37 @@ resource "azurerm_application_gateway" "testproject-agw" {
   //////// END OF LISTENERS ////////
 
   //////// ROUTING RULES ////////
-  //////// HTTP-RULE ////////
+  /* HTTP-RULE */
   request_routing_rule {
     name                        = "http-rule"
     priority                    = 10
     rule_type                   = "Basic"
     http_listener_name          = "http-listener"
-    redirect_configuration_name = "http-to-https-redirect"
+    redirect_configuration_name = "http-rule"
   }
 
   redirect_configuration {
-    name                 = "http-to-https-redirect"
+    name                 = "http-rule"
     redirect_type        = "Permanent"
     target_listener_name = "https-listener"
     include_path         = true
     include_query_string = true
   }
 
-  //////// HTTPS-RULE ////////
+  /* END OF HTTP RULE */
+
+  /* HTTPS-RULE */
   request_routing_rule {
     name               = "https-rule"
     priority           = 100
     http_listener_name = "https-listener"
     rule_type          = "PathBasedRouting"
-    url_path_map_name  = "https-path-map"
+    url_path_map_name  = "https-rule"
   }
 
   url_path_map {
-    name = "https-path-map"
+    name                                 = "https-rule"
+    default_redirect_configuration_name = "https-rule"
 
     path_rule {
       paths                      = ["/sendapi/*"]
@@ -249,20 +263,28 @@ resource "azurerm_application_gateway" "testproject-agw" {
     path_rule {
       paths                       = ["/as4/"]
       name                        = "redirect-as4"
-      redirect_configuration_name = "external-site-redirect"
+      redirect_configuration_name = "https-rule_redirect"
       rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
     }
 
     path_rule {
       paths                       = ["/as4/status*"]
-      name                        = "as4-redirect-rule"
-      redirect_configuration_name = "as4-redirect"
+      name                        = "redirect-as4-status"
+      redirect_configuration_name = "https-rule_redirect-status"
       rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
     }
   }
 
   redirect_configuration {
-    name                 = "redirect-as4"
+    name                 = "https-rule_redirect"
+    redirect_type        = "Permanent"
+    target_url           = "https://invoicenow-ap-uat.anacle.com/as4"
+    include_path         = true
+    include_query_string = true
+  }
+
+  redirect_configuration {
+    name                 = "https-rule_redirect-status"
     redirect_type        = "Permanent"
     target_url           = "https://invoicenow-ap-uat.anacle.com/as4"
     include_path         = false
@@ -270,27 +292,43 @@ resource "azurerm_application_gateway" "testproject-agw" {
   }
 
   redirect_configuration {
-    name                 = "redirect-as4-status"
+    name                 = "https-rule_redirect-as4"
     redirect_type        = "Permanent"
     target_url           = "https://invoicenow-ap-uat.anacle.com/as4"
     include_path         = false
     include_query_string = false
   }
 
-  //////// END OF HTTPS RULE ////////
+  redirect_configuration {
+    name                 = "https-rule_redirect-as4-status"
+    redirect_type        = "Permanent"
+    target_url           = "https://invoicenow-ap-uat.anacle.com/as4"
+    include_path         = false
+    include_query_string = false
+  }
 
-  //////// TEMP RULE ////////
+  redirect_configuration {
+    name                 = "https-rule"
+    redirect_type        = "Permanent"
+    target_url           = "https://invoicenow-ap-uat.anacle.com/admin"
+    include_path         = true
+    include_query_string = true
+  }
+
+  /* END OF HTTPS RULE */
+
+  /* TEMP RULE */
 
   request_routing_rule {
     name               = "temp-rule"
     priority           = 5000
     http_listener_name = "temp-listener"
     rule_type          = "PathBasedRouting"
-    url_path_map_name  = "temp-path-map"
+    url_path_map_name  = "temp-rule"
   }
 
   url_path_map {
-    name                               = "temp-path-map"
+    name                               = "temp-rule"
     default_backend_address_pool_name  = "empty"
     default_backend_http_settings_name = "temp-settings"
 
@@ -302,7 +340,7 @@ resource "azurerm_application_gateway" "testproject-agw" {
       rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
     }
   }
-  //////// END OF TEMP RULE ////////
+  /* END OF TEMP RULE */
   //////// END OF ROUTING RULES ////////
 
   //////// REWRITES ////////
@@ -388,5 +426,6 @@ resource "azurerm_application_gateway" "testproject-agw" {
       body        = ""
     }
   }
-  //////// END OF HEALTH PROBES ////////
+
+    //////// END OF HEALTH PROBES ////////
 }
