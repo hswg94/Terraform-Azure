@@ -157,3 +157,24 @@ resource "azurerm_network_security_group" "nsg-ppl-uatweb-apgw01" {
     destination_address_prefix = "*"
   }
 }
+
+# Network Security Group Associations
+resource "azurerm_subnet_network_security_group_association" "agw-nsg-association" {
+  subnet_id                 = azurerm_subnet.testproject-agw-subnet.id
+  network_security_group_id = azurerm_network_security_group.nsg-ppl-uatweb-apgw01.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "app-nsg-association" {
+  subnet_id                 = azurerm_subnet.testproject-app-subnet.id
+  network_security_group_id = azurerm_network_security_group.nsg-ppl-uatapt-app01.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "db-nsg-association" {
+  subnet_id                 = azurerm_subnet.testproject-db-subnet.id
+  network_security_group_id = azurerm_network_security_group.nsg-ppl-uatdbt-dbs01.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "mgmt-nsg-association" {
+  subnet_id                 = azurerm_subnet.testproject-mgmt-subnet.id
+  network_security_group_id = azurerm_network_security_group.nsg-ppl-uatmgt-jh01.id
+}
