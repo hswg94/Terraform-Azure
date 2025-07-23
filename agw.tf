@@ -55,10 +55,6 @@ resource "azurerm_application_gateway" "testproject-agw" {
 
   backend_address_pool {
     name = "simplicity-app"
-    # VMs will be automatically associated through their NICs or VMSS
-    # Alternatively, you can explicitly specify:
-    # ip_addresses = ["10.0.2.10", "10.0.2.11"]
-    # fqdns = ["vm1.domain.com", "vm2.domain.com"]
   }
 
   backend_address_pool {
