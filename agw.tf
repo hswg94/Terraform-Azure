@@ -51,7 +51,11 @@ resource "azurerm_application_gateway" "testproject-agw" {
     name = "simplicity-app"
   }
 
-  //// BACKEND SETTINGS ////
+  backend_address_pool {
+    name = "empty"
+  }
+
+  //////// BACKEND SETTINGS ////////
   backend_http_settings {
     name                  = "temp-settings"
     protocol              = "Http"
@@ -128,44 +132,44 @@ resource "azurerm_application_gateway" "testproject-agw" {
     probe_name                          = "admin-probe"
   }
 
-  ////////////////////////////
+  //////// END OF BACKEND SETTINGS ////////
 
   frontend_ip_configuration {
     name                 = "appGwPublicFrontendIpIPv4"
     public_ip_address_id = azurerm_public_ip.testproject-agw-pip.id
   }
 
-  ////////////////////// FRONTEND PORTS //////////////////////
+  //////// FRONTEND PORTS ////////
   frontend_port {
-    name = "appGwPublicFrontendPort80"
+    name = "port_80"
     port = 80
   }
 
   frontend_port {
-    name = "appGwPublicFrontendPort443"
+    name = "port_443"
     port = 443
   }
 
   frontend_port {
-    name = "appGwPublicFrontendPort8008"
+    name = "port_8008"
     port = 8008
   }
-  /////////////////////////////////////////////////////////
+  //////// END OF FRONTEND PORTS ////////
 
-  ////////////////////// SSL CERTIFICATES //////////////////////
+  //////// SSL CERTIFICATES ////////
   ssl_certificate {
     name     = "wildcard-anacle-com-2024-25"
     data     = filebase64("path/to/your/certificate.pfx") # Update this path
     password = "your_certificate_password"                # Update this password
   }
-  //////////////////////////////////////////////////////////////
+  //////// END OF SSL CERTIFICATES ////////
 
-  ////////////////////// LISTENERS //////////////////////
+  //////// LISTENERS ////////
   http_listener {
     name                           = "http-listener"
     frontend_ip_configuration_name = "appGwPublicFrontendIpIPv4"
     protocol                       = "Http"
-    frontend_port_name             = "appGwPublicFrontendPort80"
+    frontend_port_name             = "port_80"
     host_name                      = "invoicenow-ap-uat.anacle.com"
   }
 
@@ -173,7 +177,7 @@ resource "azurerm_application_gateway" "testproject-agw" {
     name                           = "https-listener"
     frontend_ip_configuration_name = "appGwPublicFrontendIpIPv4"
     protocol                       = "Https"
-    frontend_port_name             = "appGwPublicFrontendPort443"
+    frontend_port_name             = "port_443"
     host_name                      = "invoicenow-ap-uat.anacle.com"
     ssl_certificate_name           = "wildcard-anacle-com-2024-25"
     require_sni                    = true
@@ -183,13 +187,13 @@ resource "azurerm_application_gateway" "testproject-agw" {
     name                           = "temp-listener"
     frontend_ip_configuration_name = "appGwPublicFrontendIpIPv4"
     protocol                       = "Http"
-    frontend_port_name             = "appGwPublicFrontendPort8008"
+    frontend_port_name             = "port_8008"
   }
 
-  ///////////////////////////////////////////////////////
+  //////// END OF LISTENERS ////////
 
-  ////////////////////// ROUTING RULES //////////////////////
-  ////// HTTP-RULE //////
+  //////// ROUTING RULES ////////
+  //////// HTTP-RULE ////////
   request_routing_rule {
     name                        = "http-rule"
     priority                    = 10
@@ -206,7 +210,7 @@ resource "azurerm_application_gateway" "testproject-agw" {
     include_query_string = true
   }
 
-  /////// HTTPS-RULE ///////
+  //////// HTTPS-RULE ////////
   request_routing_rule {
     name               = "https-rule"
     priority           = 100
@@ -223,6 +227,7 @@ resource "azurerm_application_gateway" "testproject-agw" {
       name                       = "sendapi"
       backend_http_settings_name = "sendapi-backend-settings"
       backend_address_pool_name  = "simplicity-app"
+      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
     }
 
     path_rule {
@@ -230,6 +235,7 @@ resource "azurerm_application_gateway" "testproject-agw" {
       name                       = "admin"
       backend_http_settings_name = "admin-backendsettings"
       backend_address_pool_name  = "simplicity-app"
+      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
     }
 
     path_rule {
@@ -237,18 +243,21 @@ resource "azurerm_application_gateway" "testproject-agw" {
       name                       = "oxalis"
       backend_http_settings_name = "as4-backendsettings"
       backend_address_pool_name  = "simplicity-app"
+      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
     }
 
     path_rule {
       paths                       = ["/as4/"]
       name                        = "redirect-as4"
       redirect_configuration_name = "external-site-redirect"
+      rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
     }
 
     path_rule {
       paths                       = ["/as4/status*"]
       name                        = "as4-redirect-rule"
       redirect_configuration_name = "as4-redirect"
+      rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
     }
   }
 
@@ -268,8 +277,118 @@ resource "azurerm_application_gateway" "testproject-agw" {
     include_query_string = false
   }
 
-  ///////////////////// END OF HTTPS RULE ///////////////////
-  ///////////////////////////////////////////////////////////
-  ////////////////////// URL PATH MAPS //////////////////////
-  ///////////////////////////////////////////////////////////
+  //////// END OF HTTPS RULE ////////
+
+  //////// TEMP RULE ////////
+
+  request_routing_rule {
+    name               = "temp-rule"
+    priority           = 5000
+    http_listener_name = "temp-listener"
+    rule_type          = "PathBasedRouting"
+    url_path_map_name  = "temp-path-map"
+  }
+
+  url_path_map {
+    name                               = "temp-path-map"
+    default_backend_address_pool_name  = "empty"
+    default_backend_http_settings_name = "temp-settings"
+
+    path_rule {
+      paths                      = ["/admin"]
+      name                       = "admin-page"
+      backend_http_settings_name = "temp-settings"
+      backend_address_pool_name  = "empty"
+      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
+    }
+  }
+  //////// END OF TEMP RULE ////////
+  //////// END OF ROUTING RULES ////////
+
+  //////// REWRITES ////////
+  rewrite_rule_set {
+    name = "rws-ppl-uatweb-ag-01"
+
+    rewrite_rule {
+      name          = "ppl-uat-rewrite-01"
+      rule_sequence = 100
+
+      condition {
+        variable    = "http_resp_Set-Cookie"
+        pattern     = "(.*ApplicationGatewayAffinity=.*)"
+        ignore_case = true
+      }
+      response_header_configuration {
+        header_name  = "Set-Cookie"
+        header_value = "{http_resp_Set-Cookie_1}; HttpOnly; Secure"
+      }
+    }
+
+    rewrite_rule {
+      name          = "ppl-uat-rewrite-02"
+      rule_sequence = 101
+
+      condition {
+        variable    = "http_resp_Set-Cookie"
+        pattern     = "(.*ApplicationGatewayAffinity=.*)"
+        ignore_case = false
+      }
+      response_header_configuration {
+        header_name  = "Set-Cookie"
+        header_value = "{http_resp_Set-Cookie_1}; HttpOnly; Secure"
+      }
+    }
+  }
+  //////// END OF REWRITES ////////
+
+  //////// HEALTH PROBES ////////
+  probe {
+    name                                      = "admin-probe"
+    protocol                                  = "Http"
+    path                                      = "/admin"
+    interval                                  = 30
+    timeout                                   = 30
+    unhealthy_threshold                       = 3
+    pick_host_name_from_backend_http_settings = true
+    minimum_servers                           = 0
+
+    match {
+      status_code = ["200-399"]
+      body        = ""
+    }
+  }
+
+  probe {
+    name                                      = "sendapi-probe"
+    protocol                                  = "Http"
+    path                                      = "/sendapi"
+    interval                                  = 30
+    timeout                                   = 30
+    unhealthy_threshold                       = 3
+    pick_host_name_from_backend_http_settings = true
+    minimum_servers                           = 0
+
+    match {
+      status_code = ["200-499"]
+      body        = ""
+    }
+  }
+
+  probe {
+    name                                      = "as4-probe"
+    protocol                                  = "Http"
+    path                                      = "/as4"
+    interval                                  = 30
+    timeout                                   = 30
+    unhealthy_threshold                       = 3
+    pick_host_name_from_backend_http_settings = true
+    minimum_servers                           = 0
+
+    match {
+      status_code = ["200-399"]
+      body        = ""
+    }
+  }
+  //////// END OF HEALTH PROBES ////////
+
 }
