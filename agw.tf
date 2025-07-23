@@ -1,14 +1,3 @@
-# Since these variables are re-used - a locals block makes this more maintainable
-# locals {
-#   backend_address_pool_name      = "testproject-agw-backend-pool"
-#   frontend_port_name             = "testproject-agw-frontend-port"
-#   frontend_ip_configuration_name = "testproject-agw-frontend-ip-configuration"
-#   http_setting_name              = "testproject-agw-backend-http-setting"
-#   listener_name                  = "testproject-agw-http-listener"
-#   request_routing_rule_name      = "testproject-agw-routing-rule"
-#   redirect_configuration_name    = "testproject-agw-redirect-configuration"
-# }
-
 resource "azurerm_public_ip" "testproject-agw-pip" {
   name                = "pip-ppl-uat-apgw01"
   resource_group_name = azurerm_resource_group.testproject-rg.name
