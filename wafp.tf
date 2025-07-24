@@ -12,6 +12,7 @@ resource "azurerm_web_application_firewall_policy" "wafp-ppl-uatweb-apgw" {
     request_body_inspect_limit_in_kb = 128
     file_upload_enforcement     = true
     file_upload_limit_in_mb     = 100
+    js_challenge_cookie_expiration_in_minutes = 5
   }
 
   managed_rules {
