@@ -57,10 +57,6 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     protocol              = "Http"
     port                  = 80
     cookie_based_affinity = "Disabled"
-    connection_draining {
-      enabled           = false
-      drain_timeout_sec = 1
-    }
     request_timeout = 20
     # path                                = "/"
     pick_host_name_from_backend_address = false
@@ -72,10 +68,6 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     protocol              = "Http"
     port                  = 80
     cookie_based_affinity = "Disabled"
-    connection_draining {
-      enabled           = false
-      drain_timeout_sec = 1
-    }
     request_timeout = 2000
     # path                                = "/"
     pick_host_name_from_backend_address = false
@@ -87,10 +79,6 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     protocol              = "Http"
     port                  = 80
     cookie_based_affinity = "Disabled"
-    connection_draining {
-      enabled           = false
-      drain_timeout_sec = 1
-    }
     request_timeout = 1200
     # path                                = "/"
     pick_host_name_from_backend_address = true
@@ -102,10 +90,6 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     protocol              = "Http"
     port                  = 8080
     cookie_based_affinity = "Disabled"
-    connection_draining {
-      enabled           = false
-      drain_timeout_sec = 1
-    }
     request_timeout = 1200
     # path                                = "/"
     pick_host_name_from_backend_address = true
@@ -118,10 +102,6 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     port                  = 80
     cookie_based_affinity = "Enabled"
     affinity_cookie_name  = "ApplicationGatewayAffinity"
-    connection_draining {
-      enabled           = false
-      drain_timeout_sec = 1
-    }
     request_timeout = 1200
     # path                                = "/"
     pick_host_name_from_backend_address = true
@@ -218,45 +198,16 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   }
 
   url_path_map {
-    name                                 = "https-rule"
-    default_redirect_configuration_name = "https-rule"
+    name                               = "temp-rule"
+    default_backend_address_pool_name  = "empty"
+    default_backend_http_settings_name = "temp-settings"
 
     path_rule {
-      paths                      = ["/sendapi/*"]
-      name                       = "sendapi"
-      backend_http_settings_name = "sendapi-backendsettings"
-      backend_address_pool_name  = "simplicity-app"
+      paths                      = ["/admin"]
+      name                       = "admin-page"
+      backend_http_settings_name = "temp-settings"
+      backend_address_pool_name  = "empty"
       rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
-    }
-
-    path_rule {
-      paths                      = ["/admin/*"]
-      name                       = "admin"
-      backend_http_settings_name = "admin-backendsettings"
-      backend_address_pool_name  = "simplicity-app"
-      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
-    }
-
-    path_rule {
-      paths                      = ["/as4*"]
-      name                       = "oxalis"
-      backend_http_settings_name = "as4-backendsettings"
-      backend_address_pool_name  = "simplicity-app"
-      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
-    }
-
-    path_rule {
-      paths                       = ["/as4/"]
-      name                        = "redirect-as4"
-      redirect_configuration_name = "https-rule_redirect"
-      rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
-    }
-
-    path_rule {
-      paths                       = ["/as4/status*"]
-      name                        = "redirect-as4-status"
-      redirect_configuration_name = "https-rule_redirect-status"
-      rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
     }
   }
 
@@ -313,16 +264,45 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   }
 
   url_path_map {
-    name                               = "temp-rule"
-    default_backend_address_pool_name  = "empty"
-    default_backend_http_settings_name = "temp-settings"
+    name                                 = "https-rule"
+    default_redirect_configuration_name = "https-rule"
 
     path_rule {
-      paths                      = ["/admin"]
-      name                       = "admin-page"
-      backend_http_settings_name = "temp-settings"
-      backend_address_pool_name  = "empty"
+      paths                      = ["/sendapi/*"]
+      name                       = "sendapi"
+      backend_http_settings_name = "sendapi-backendsettings"
+      backend_address_pool_name  = "simplicity-app"
       rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
+    }
+
+    path_rule {
+      paths                      = ["/admin/*"]
+      name                       = "admin"
+      backend_http_settings_name = "admin-backendsettings"
+      backend_address_pool_name  = "simplicity-app"
+      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
+    }
+
+    path_rule {
+      paths                      = ["/as4*"]
+      name                       = "oxalis"
+      backend_http_settings_name = "as4-backendsettings"
+      backend_address_pool_name  = "simplicity-app"
+      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
+    }
+
+    path_rule {
+      paths                       = ["/as4/"]
+      name                        = "redirect-as4"
+      redirect_configuration_name = "https-rule_redirect-as4"
+      rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
+    }
+
+    path_rule {
+      paths                       = ["/as4/status*"]
+      name                        = "redirect-as4-status"
+      redirect_configuration_name = "https-rule_redirect-as4-status"
+      rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
     }
   }
   /* END OF TEMP RULE */
@@ -353,8 +333,8 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
 
       condition {
         variable    = "http_resp_Set-Cookie"
-        pattern     = "(.*ApplicationGatewayAffinity=.*)"
-        ignore_case = false
+        pattern     = "(.*ApplicationGatewayAffinityCORS=.*)"
+        ignore_case = true
       }
       response_header_configuration {
         header_name  = "Set-Cookie"

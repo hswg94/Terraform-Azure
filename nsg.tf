@@ -91,7 +91,7 @@ resource "azurerm_network_security_group" "nsg-ppl-uatmgt-jh01" {
   }
 
   security_rule {
-    name                       = "DenyAnyInbound"
+    name                       = "DenyAnylnBound"
     priority                   = 4096
     direction                  = "Inbound"
     access                     = "Deny"

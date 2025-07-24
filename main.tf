@@ -1,6 +1,6 @@
 # Create a resource group
 resource "azurerm_resource_group" "testproject-rg" {
-  name     = "william-testproject-rg"
+  name     = "rg-ppl-uat"
   location = "Southeast Asia"
 }
 
