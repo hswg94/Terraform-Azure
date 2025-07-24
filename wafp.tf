@@ -1,7 +1,7 @@
 resource "azurerm_web_application_firewall_policy" "wafp-ppl-uatweb-apgw" {
   name                = "wafp-ppl-uatweb-apgw"
-  resource_group_name = azurerm_resource_group.testproject-rg.name
-  location            = azurerm_resource_group.testproject-rg.location
+  resource_group_name = azurerm_resource_group.newproject-rg.name
+  location            = azurerm_resource_group.newproject-rg.location
 
   policy_settings {
     enabled                     = true

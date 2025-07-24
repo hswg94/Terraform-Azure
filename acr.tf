@@ -1,8 +1,8 @@
-# Azure Container Registry - Standard AzureRM Configuration
+# Azure Container Registry
 resource "azurerm_container_registry" "acrppluat" {
   name                = "acrppluat"
-  resource_group_name = azurerm_resource_group.testproject-rg.name
-  location            = azurerm_resource_group.testproject-rg.location
+  resource_group_name = azurerm_resource_group.newproject-rg.name
+  location            = azurerm_resource_group.newproject-rg.location
   sku                 = "Standard"
   admin_enabled       = true
 

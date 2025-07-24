@@ -1,7 +1,7 @@
 resource "azurerm_public_ip" "pip-ppl-uat-apgw01" {
   name                = "pip-ppl-uat-apgw01"
-  resource_group_name = azurerm_resource_group.testproject-rg.name
-  location            = azurerm_resource_group.testproject-rg.location
+  resource_group_name = azurerm_resource_group.newproject-rg.name
+  location            = azurerm_resource_group.newproject-rg.location
   allocation_method   = "Static"
   sku                 = "Standard"
   zones               = ["1", "2", "3"]
@@ -14,8 +14,8 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   }
 
   name                = "apgw-ppl-uatweb-ag"
-  resource_group_name = azurerm_resource_group.testproject-rg.name
-  location            = azurerm_resource_group.testproject-rg.location
+  resource_group_name = azurerm_resource_group.newproject-rg.name
+  location            = azurerm_resource_group.newproject-rg.location
   enable_http2        = true
   zones               = ["1", "2", "3"]
 

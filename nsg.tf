@@ -1,8 +1,8 @@
 # Network Security Group for Application Subnet
 resource "azurerm_network_security_group" "nsg-ppl-uatapt-app01" {
   name                = "nsg-ppl-uatapt-app01"
-  location            = azurerm_resource_group.testproject-rg.location
-  resource_group_name = azurerm_resource_group.testproject-rg.name
+  location            = azurerm_resource_group.newproject-rg.location
+  resource_group_name = azurerm_resource_group.newproject-rg.name
 
   security_rule {
     name                       = "AllowJumphostInBound"
@@ -44,8 +44,8 @@ resource "azurerm_network_security_group" "nsg-ppl-uatapt-app01" {
 # Network Security Group for Database Subnet
 resource "azurerm_network_security_group" "nsg-ppl-uatdbt-dbs01" {
   name                = "nsg-ppl-uatdbt-dbs01"
-  location            = azurerm_resource_group.testproject-rg.location
-  resource_group_name = azurerm_resource_group.testproject-rg.name
+  location            = azurerm_resource_group.newproject-rg.location
+  resource_group_name = azurerm_resource_group.newproject-rg.name
 
   security_rule {
     name                       = "AllowAppSQLInBound"
@@ -75,8 +75,8 @@ resource "azurerm_network_security_group" "nsg-ppl-uatdbt-dbs01" {
 # Network Security Group for Management Subnet
 resource "azurerm_network_security_group" "nsg-ppl-uatmgt-jh01" {
   name                = "nsg-ppl-uatmgt-jh01"
-  location            = azurerm_resource_group.testproject-rg.location
-  resource_group_name = azurerm_resource_group.testproject-rg.name
+  location            = azurerm_resource_group.newproject-rg.location
+  resource_group_name = azurerm_resource_group.newproject-rg.name
 
   security_rule {
     name                       = "AllowBastionInBound"
@@ -106,8 +106,8 @@ resource "azurerm_network_security_group" "nsg-ppl-uatmgt-jh01" {
 # Network Security Group for Application Gateway Subnet
 resource "azurerm_network_security_group" "nsg-ppl-uatweb-apgw01" {
   name                = "nsg-ppl-uatweb-apgw01"
-  location            = azurerm_resource_group.testproject-rg.location
-  resource_group_name = azurerm_resource_group.testproject-rg.name
+  location            = azurerm_resource_group.newproject-rg.location
+  resource_group_name = azurerm_resource_group.newproject-rg.name
 
   security_rule {
     name                       = "AllowHttpHttpsInBound"
