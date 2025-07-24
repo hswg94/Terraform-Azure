@@ -5,6 +5,7 @@ resource "azurerm_public_ip" "pip-ppl-uat-natgw01" {
   resource_group_name = azurerm_resource_group.testproject-rg.name
   allocation_method   = "Static"
   sku                 = "Standard"
+  zones               = ["1", "2", "3"]
 }
 
 # NAT Gateway
