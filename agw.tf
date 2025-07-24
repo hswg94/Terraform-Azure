@@ -1,4 +1,4 @@
-resource "azurerm_public_ip" "testproject-agw-pip" {
+resource "azurerm_public_ip" "pip-ppl-uat-apgw01" {
   name                = "pip-ppl-uat-apgw01"
   resource_group_name = azurerm_resource_group.testproject-rg.name
   location            = azurerm_resource_group.testproject-rg.location
@@ -7,7 +7,7 @@ resource "azurerm_public_ip" "testproject-agw-pip" {
   zones               = ["1", "2", "3"]
 }
 
-resource "azurerm_application_gateway" "testproject-agw" {
+resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   gateway_ip_configuration {
     name      = "appGatewayIpConfig"
     subnet_id = azurerm_subnet.testproject-agw-subnet.id
@@ -132,7 +132,7 @@ resource "azurerm_application_gateway" "testproject-agw" {
 
   frontend_ip_configuration {
     name                 = "appGwPublicFrontendIpIPv4"
-    public_ip_address_id = azurerm_public_ip.testproject-agw-pip.id
+    public_ip_address_id = azurerm_public_ip.pip-ppl-uat-apgw01.id
   }
 
   //////// FRONTEND PORTS ////////
