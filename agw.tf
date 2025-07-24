@@ -19,6 +19,10 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   enable_http2        = true
   zones               = ["1", "2", "3"]
 
+  lifecycle {
+    ignore_changes = [ssl_certificate]
+  }
+
   sku {
     name = "WAF_v2"
     tier = "WAF_v2"
@@ -57,6 +61,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     protocol              = "Http"
     port                  = 80
     cookie_based_affinity = "Disabled"
+    affinity_cookie_name  = "ApplicationGatewayAffinity"
     request_timeout = 20
     # path                                = "/"
     pick_host_name_from_backend_address = false
@@ -68,6 +73,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     protocol              = "Http"
     port                  = 80
     cookie_based_affinity = "Disabled"
+    affinity_cookie_name  = "ApplicationGatewayAffinity"
     request_timeout = 2000
     # path                                = "/"
     pick_host_name_from_backend_address = false
@@ -133,10 +139,10 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   //////// END OF FRONTEND PORTS ////////
 
   //////// SSL CERTIFICATES ////////
+  # SSL certificate managed outside of Terraform to avoid sensitive data handling
   # ssl_certificate {
   #   name     = "wildcard-anacle-com-2024-25"
-  #   data     = filebase64("path/to/your/certificate.pfx") # Update this path
-  #   password = "your_certificate_password"                # Update this password
+  #   # Certificate data managed externally
   # }
   //////// END OF SSL CERTIFICATES ////////
 
@@ -176,6 +182,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     rule_type                   = "Basic"
     http_listener_name          = "http-listener"
     redirect_configuration_name = "http-rule"
+    rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
   }
 
   redirect_configuration {
@@ -198,16 +205,16 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   }
 
   url_path_map {
-    name                               = "temp-rule"
-    default_backend_address_pool_name  = "empty"
-    default_backend_http_settings_name = "temp-settings"
+    name                                 = "temp-rule"
+    default_backend_address_pool_name    = "empty"
+    default_backend_http_settings_name   = "temp-settings"
+    default_rewrite_rule_set_name        = "rws-ppl-uatweb-ag-01"
 
     path_rule {
       paths                      = ["/admin"]
       name                       = "admin-page"
       backend_http_settings_name = "temp-settings"
       backend_address_pool_name  = "empty"
-      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
     }
   }
 
@@ -266,6 +273,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   url_path_map {
     name                                 = "https-rule"
     default_redirect_configuration_name = "https-rule"
+    default_rewrite_rule_set_name        = "rws-ppl-uatweb-ag-01"
 
     path_rule {
       paths                      = ["/sendapi/*"]
@@ -284,14 +292,6 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     }
 
     path_rule {
-      paths                      = ["/as4*"]
-      name                       = "oxalis"
-      backend_http_settings_name = "as4-backendsettings"
-      backend_address_pool_name  = "simplicity-app"
-      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
-    }
-
-    path_rule {
       paths                       = ["/as4/"]
       name                        = "redirect-as4"
       redirect_configuration_name = "https-rule_redirect-as4"
@@ -303,6 +303,14 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
       name                        = "redirect-as4-status"
       redirect_configuration_name = "https-rule_redirect-as4-status"
       rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
+    }
+
+    path_rule {
+      paths                      = ["/as4*"]
+      name                       = "oxalis"
+      backend_http_settings_name = "as4-backendsettings"
+      backend_address_pool_name  = "simplicity-app"
+      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
     }
   }
   /* END OF TEMP RULE */
