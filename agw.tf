@@ -19,9 +19,6 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   enable_http2        = true
   zones               = ["1", "2", "3"]
 
-  lifecycle {
-    ignore_changes = [ssl_certificate]
-  }
 
   sku {
     name = "WAF_v2"
@@ -145,6 +142,11 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   #   # Certificate data managed externally
   # }
   //////// END OF SSL CERTIFICATES ////////
+
+  lifecycle {
+    ignore_changes = [ssl_certificate]
+  }
+
 
   //////// LISTENERS ////////
   http_listener {
