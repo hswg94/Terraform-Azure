@@ -19,7 +19,6 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   enable_http2        = true
   zones               = ["1", "2", "3"]
 
-
   sku {
     name = "WAF_v2"
     tier = "WAF_v2"
@@ -146,7 +145,6 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   lifecycle {
     ignore_changes = [ssl_certificate]
   }
-
 
   //////// LISTENERS ////////
   http_listener {
@@ -401,6 +399,5 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
       body        = ""
     }
   }
-
     //////// END OF HEALTH PROBES ////////
 }
