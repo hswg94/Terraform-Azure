@@ -11,7 +11,7 @@ resource "azurerm_network_security_group" "nsg-ppl-uatapt-app01" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    source_address_prefix      = "172.18.132.228/32" // Jumphost IP
+    source_address_prefix      = var.jumphost_ip
     destination_address_prefix = azurerm_subnet.newproj-app01-subnet.address_prefixes[0]
     destination_port_ranges    = ["3389", "22"]
   }
@@ -85,8 +85,8 @@ resource "azurerm_network_security_group" "nsg-ppl-uatmgt-jh01" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    source_address_prefix      = "172.18.17.0/26" // Bastion subnet from anacle central network
-    destination_address_prefix = "172.18.132.228/32" // Jumphost IP
+    source_address_prefix      = var.bastion_subnet_cidr
+    destination_address_prefix = var.jumphost_ip
     destination_port_range     = "3389"
   }
 
