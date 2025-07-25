@@ -1,8 +1,8 @@
 # Network Security Group for Application Subnet
 resource "azurerm_network_security_group" "nsg-ppl-uatapt-app01" {
   name                = "nsg-ppl-uatapt-app01"
-  location            = azurerm_resource_group.newproject-rg.location
-  resource_group_name = azurerm_resource_group.newproject-rg.name
+  location            = azurerm_resource_group.newproj-rg.location
+  resource_group_name = azurerm_resource_group.newproj-rg.name
 
   security_rule {
     name                       = "AllowJumphostInBound"
@@ -11,8 +11,8 @@ resource "azurerm_network_security_group" "nsg-ppl-uatapt-app01" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    source_address_prefix      = "172.18.132.228/32"
-    destination_address_prefix = "172.18.132.16/28"
+    source_address_prefix      = "172.18.132.228/32" // Jumphost IP
+    destination_address_prefix = azurerm_subnet.newproj-app01-subnet.address_prefixes[0]
     destination_port_ranges    = ["3389", "22"]
   }
 
@@ -23,8 +23,8 @@ resource "azurerm_network_security_group" "nsg-ppl-uatapt-app01" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    source_address_prefix      = "172.18.132.0/28"
-    destination_address_prefix = "172.18.132.16/28"
+    source_address_prefix      = azurerm_subnet.newproj-agw01-subnet.address_prefixes[0]
+    destination_address_prefix = azurerm_subnet.newproj-app01-subnet.address_prefixes[0]
     destination_port_ranges    = ["80", "443", "8080"]
   }
 
@@ -44,8 +44,8 @@ resource "azurerm_network_security_group" "nsg-ppl-uatapt-app01" {
 # Network Security Group for Database Subnet
 resource "azurerm_network_security_group" "nsg-ppl-uatdbt-dbs01" {
   name                = "nsg-ppl-uatdbt-dbs01"
-  location            = azurerm_resource_group.newproject-rg.location
-  resource_group_name = azurerm_resource_group.newproject-rg.name
+  location            = azurerm_resource_group.newproj-rg.location
+  resource_group_name = azurerm_resource_group.newproj-rg.name
 
   security_rule {
     name                       = "AllowAppSQLInBound"
@@ -54,8 +54,8 @@ resource "azurerm_network_security_group" "nsg-ppl-uatdbt-dbs01" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    source_address_prefix      = "172.18.132.16/28"
-    destination_address_prefix = "172.18.132.48/28"
+    source_address_prefix      = azurerm_subnet.newproj-app01-subnet.address_prefixes[0]
+    destination_address_prefix = azurerm_subnet.newproj-db-subnet.address_prefixes[0]
     destination_port_range     = "1433"
   }
 
@@ -72,11 +72,11 @@ resource "azurerm_network_security_group" "nsg-ppl-uatdbt-dbs01" {
   }
 }
 
-# Network Security Group for Management Subnet
+# Network Security Group for Jumphost Subnet
 resource "azurerm_network_security_group" "nsg-ppl-uatmgt-jh01" {
   name                = "nsg-ppl-uatmgt-jh01"
-  location            = azurerm_resource_group.newproject-rg.location
-  resource_group_name = azurerm_resource_group.newproject-rg.name
+  location            = azurerm_resource_group.newproj-rg.location
+  resource_group_name = azurerm_resource_group.newproj-rg.name
 
   security_rule {
     name                       = "AllowBastionInBound"
@@ -85,8 +85,8 @@ resource "azurerm_network_security_group" "nsg-ppl-uatmgt-jh01" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    source_address_prefix      = "172.18.17.0/26"
-    destination_address_prefix = "172.18.132.228/32"
+    source_address_prefix      = "172.18.17.0/26" // Bastion subnet from anacle central network
+    destination_address_prefix = "172.18.132.228/32" // Jumphost IP
     destination_port_range     = "3389"
   }
 
@@ -106,8 +106,8 @@ resource "azurerm_network_security_group" "nsg-ppl-uatmgt-jh01" {
 # Network Security Group for Application Gateway Subnet
 resource "azurerm_network_security_group" "nsg-ppl-uatweb-apgw01" {
   name                = "nsg-ppl-uatweb-apgw01"
-  location            = azurerm_resource_group.newproject-rg.location
-  resource_group_name = azurerm_resource_group.newproject-rg.name
+  location            = azurerm_resource_group.newproj-rg.location
+  resource_group_name = azurerm_resource_group.newproj-rg.name
 
   security_rule {
     name                       = "AllowHttpHttpsInBound"
@@ -117,7 +117,7 @@ resource "azurerm_network_security_group" "nsg-ppl-uatweb-apgw01" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     source_address_prefix      = "*"
-    destination_address_prefix = "172.18.132.0/28"
+    destination_address_prefix = azurerm_subnet.newproj-agw01-subnet.address_prefixes[0]
     destination_port_ranges    = ["80", "443"]
   }
 
@@ -160,21 +160,21 @@ resource "azurerm_network_security_group" "nsg-ppl-uatweb-apgw01" {
 
 # Network Security Group Associations
 resource "azurerm_subnet_network_security_group_association" "agw-nsg-association" {
-  subnet_id                 = azurerm_subnet.testproject-agw-subnet.id
+  subnet_id                 = azurerm_subnet.newproj-agw01-subnet.id
   network_security_group_id = azurerm_network_security_group.nsg-ppl-uatweb-apgw01.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "app-nsg-association" {
-  subnet_id                 = azurerm_subnet.testproject-app-subnet.id
+  subnet_id                 = azurerm_subnet.newproj-app01-subnet.id
   network_security_group_id = azurerm_network_security_group.nsg-ppl-uatapt-app01.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "db-nsg-association" {
-  subnet_id                 = azurerm_subnet.testproject-db-subnet.id
+  subnet_id                 = azurerm_subnet.newproj-db-subnet.id
   network_security_group_id = azurerm_network_security_group.nsg-ppl-uatdbt-dbs01.id
 }
 
-resource "azurerm_subnet_network_security_group_association" "mgmt-nsg-association" {
-  subnet_id                 = azurerm_subnet.testproject-mgmt-subnet.id
+resource "azurerm_subnet_network_security_group_association" "jh-nsg-association" {
+  subnet_id                 = azurerm_subnet.newproj-jh-subnet.id
   network_security_group_id = azurerm_network_security_group.nsg-ppl-uatmgt-jh01.id
 }

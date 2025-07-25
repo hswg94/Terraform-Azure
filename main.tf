@@ -1,23 +1,23 @@
 # Create a resource group
-resource "azurerm_resource_group" "newproject-rg" {
+resource "azurerm_resource_group" "newproj-rg" {
   name     = "rg-ppl-uat"
   location = "Southeast Asia"
 }
 
 # virtual network
-resource "azurerm_virtual_network" "testproject-vnet" {
+resource "azurerm_virtual_network" "newproj-vnet" {
   name                = "vnet-uat-ppl"
-  resource_group_name = azurerm_resource_group.newproject-rg.name
-  location            = azurerm_resource_group.newproject-rg.location
+  resource_group_name = azurerm_resource_group.newproj-rg.name
+  location            = azurerm_resource_group.newproj-rg.location
   address_space       = ["172.18.132.0/24"]
   dns_servers = ["172.18.17.68", "172.18.17.69"]
 }
 
 # Application Gateway subnet
-resource "azurerm_subnet" "testproject-agw-subnet" {
+resource "azurerm_subnet" "newproj-agw01-subnet" {
   name                 = "sub-ppl-uatweb-appgw01"
-  resource_group_name  = azurerm_resource_group.newproject-rg.name
-  virtual_network_name = azurerm_virtual_network.testproject-vnet.name
+  resource_group_name  = azurerm_resource_group.newproj-rg.name
+  virtual_network_name = azurerm_virtual_network.newproj-vnet.name
   address_prefixes     = ["172.18.132.0/28"]
 
   # Disable default outbound access
@@ -25,10 +25,10 @@ resource "azurerm_subnet" "testproject-agw-subnet" {
 }
 
 # Application subnet for VMs
-resource "azurerm_subnet" "testproject-app-subnet" {
+resource "azurerm_subnet" "newproj-app01-subnet" {
   name                 = "sub-ppl-uatapt-app01"
-  resource_group_name  = azurerm_resource_group.newproject-rg.name
-  virtual_network_name = azurerm_virtual_network.testproject-vnet.name
+  resource_group_name  = azurerm_resource_group.newproj-rg.name
+  virtual_network_name = azurerm_virtual_network.newproj-vnet.name
   address_prefixes     = ["172.18.132.16/28"]
 
   # Disable default outbound access
@@ -39,10 +39,10 @@ resource "azurerm_subnet" "testproject-app-subnet" {
 }
 
 # Database subnet for private endpoints
-resource "azurerm_subnet" "testproject-db-subnet" {
+resource "azurerm_subnet" "newproj-db-subnet" {
   name                 = "sub-ppl-uatdbt-dbs01"
-  resource_group_name  = azurerm_resource_group.newproject-rg.name
-  virtual_network_name = azurerm_virtual_network.testproject-vnet.name
+  resource_group_name  = azurerm_resource_group.newproj-rg.name
+  virtual_network_name = azurerm_virtual_network.newproj-vnet.name
   address_prefixes     = ["172.18.132.48/28"]
 
   # Disable default outbound access
@@ -53,10 +53,10 @@ resource "azurerm_subnet" "testproject-db-subnet" {
 }
 
 # Management/Jump Host subnet
-resource "azurerm_subnet" "testproject-mgmt-subnet" {
+resource "azurerm_subnet" "newproj-jh-subnet" {
   name                 = "sub-ppl-uatmgt-jh01"
-  resource_group_name  = azurerm_resource_group.newproject-rg.name
-  virtual_network_name = azurerm_virtual_network.testproject-vnet.name
+  resource_group_name  = azurerm_resource_group.newproj-rg.name
+  virtual_network_name = azurerm_virtual_network.newproj-vnet.name
   address_prefixes     = ["172.18.132.224/28"]
 
   # Disable default outbound access
