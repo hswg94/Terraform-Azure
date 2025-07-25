@@ -205,16 +205,46 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
   }
 
   url_path_map {
-    name                                 = "temp-rule"
-    default_backend_address_pool_name    = "empty"
-    default_backend_http_settings_name   = "temp-settings"
+    name                                 = "https-rule"
+    default_redirect_configuration_name = "https-rule"
     default_rewrite_rule_set_name        = "rws-${var.project_name}-${var.environment}web-ag-01"
 
     path_rule {
-      paths                      = ["/admin"]
-      name                       = "admin-page"
-      backend_http_settings_name = "temp-settings"
-      backend_address_pool_name  = "empty"
+      paths                      = ["/sendapi/*"]
+      name                       = "sendapi"
+      backend_http_settings_name = "sendapi-backendsettings"
+      backend_address_pool_name  = "simplicity-app"
+      rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
+    }
+
+    path_rule {
+      paths                      = ["/admin/*"]
+      name                       = "admin"
+      backend_http_settings_name = "admin-backendsettings"
+      backend_address_pool_name  = "simplicity-app"
+      rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
+    }
+
+    path_rule {
+      paths                       = ["/as4/"]
+      name                        = "redirect-as4"
+      redirect_configuration_name = "https-rule_redirect-as4"
+      rewrite_rule_set_name       = "rws-${var.project_name}-${var.environment}web-ag-01"
+    }
+
+    path_rule {
+      paths                       = ["/as4/status*"]
+      name                        = "redirect-as4-status"
+      redirect_configuration_name = "https-rule_redirect-as4-status"
+      rewrite_rule_set_name       = "rws-${var.project_name}-${var.environment}web-ag-01"
+    }
+
+    path_rule {
+      paths                      = ["/as4*"]
+      name                       = "oxalis"
+      backend_http_settings_name = "as4-backendsettings"
+      backend_address_pool_name  = "simplicity-app"
+      rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
     }
   }
 
@@ -271,49 +301,21 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
   }
 
   url_path_map {
-    name                                 = "https-rule"
-    default_redirect_configuration_name = "https-rule"
+    name                                 = "temp-rule"
+    default_backend_address_pool_name    = "empty"
+    default_backend_http_settings_name   = "temp-settings"
     default_rewrite_rule_set_name        = "rws-${var.project_name}-${var.environment}web-ag-01"
 
     path_rule {
-      paths                      = ["/sendapi/*"]
-      name                       = "sendapi"
-      backend_http_settings_name = "sendapi-backendsettings"
-      backend_address_pool_name  = "simplicity-app"
-      rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
-    }
-
-    path_rule {
-      paths                      = ["/admin/*"]
-      name                       = "admin"
-      backend_http_settings_name = "admin-backendsettings"
-      backend_address_pool_name  = "simplicity-app"
-      rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
-    }
-
-    path_rule {
-      paths                       = ["/as4/"]
-      name                        = "redirect-as4"
-      redirect_configuration_name = "https-rule_redirect-as4"
-      rewrite_rule_set_name       = "rws-${var.project_name}-${var.environment}web-ag-01"
-    }
-
-    path_rule {
-      paths                       = ["/as4/status*"]
-      name                        = "redirect-as4-status"
-      redirect_configuration_name = "https-rule_redirect-as4-status"
-      rewrite_rule_set_name       = "rws-${var.project_name}-${var.environment}web-ag-01"
-    }
-
-    path_rule {
-      paths                      = ["/as4*"]
-      name                       = "oxalis"
-      backend_http_settings_name = "as4-backendsettings"
-      backend_address_pool_name  = "simplicity-app"
-      rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
+      paths                      = ["/admin"]
+      name                       = "admin-page"
+      backend_http_settings_name = "temp-settings"
+      backend_address_pool_name  = "empty"
     }
   }
+
   /* END OF TEMP RULE */
+
   //////// END OF ROUTING RULES ////////
 
   //////// REWRITES ////////
@@ -399,5 +401,5 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
       body        = ""
     }
   }
-    //////// END OF HEALTH PROBES ////////
+  //////// END OF HEALTH PROBES ////////
 }
