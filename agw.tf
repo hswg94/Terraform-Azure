@@ -1,5 +1,5 @@
 resource "azurerm_public_ip" "pip-ppl-uat-apgw01" {
-  name                = "pip-ppl-uat-apgw01"
+  name                = "pip-${var.project_name}-${var.environment}-apgw01"
   resource_group_name = azurerm_resource_group.newproj-rg.name
   location            = azurerm_resource_group.newproj-rg.location
   allocation_method   = "Static"
@@ -13,7 +13,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     subnet_id = azurerm_subnet.newproj-agw01-subnet.id
   }
 
-  name                = "apgw-ppl-uatweb-ag"
+  name                = "apgw-${var.project_name}-${var.environment}web-ag"
   resource_group_name = azurerm_resource_group.newproj-rg.name
   location            = azurerm_resource_group.newproj-rg.location
   enable_http2        = true

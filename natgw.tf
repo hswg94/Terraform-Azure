@@ -1,6 +1,6 @@
 # Public IP for NAT Gateway
 resource "azurerm_public_ip" "pip-ppl-uat-natgw01" {
-  name                = "pip-ppl-uat-natgw01"
+  name                = "pip-${var.project_name}-${var.environment}-natgw01"
   location            = azurerm_resource_group.newproj-rg.location
   resource_group_name = azurerm_resource_group.newproj-rg.name
   allocation_method   = "Static"
@@ -10,7 +10,7 @@ resource "azurerm_public_ip" "pip-ppl-uat-natgw01" {
 
 # NAT Gateway
 resource "azurerm_nat_gateway" "natgw-uat-ppl" {
-  name                    = "natgw-uat-ppl"
+  name                    = "natgw-${var.environment}-${var.project_name}"
   location                = azurerm_resource_group.newproj-rg.location
   resource_group_name     = azurerm_resource_group.newproj-rg.name
   sku_name                = "Standard"

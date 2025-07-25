@@ -1,10 +1,10 @@
-# Create a resource group
+# Create a Resource Group
 resource "azurerm_resource_group" "newproj-rg" {
   name     = "rg-${var.project_name}-${var.environment}"
   location = var.location
 }
 
-# virtual network
+# Virtual Network
 resource "azurerm_virtual_network" "newproj-vnet" {
   name                = "vnet-${var.environment}-${var.project_name}"
   resource_group_name = azurerm_resource_group.newproj-rg.name

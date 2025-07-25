@@ -1,6 +1,6 @@
 # Network Security Group for Application Subnet
 resource "azurerm_network_security_group" "nsg-ppl-uatapt-app01" {
-  name                = "nsg-ppl-uatapt-app01"
+  name                = "nsg-${var.project_name}-${var.environment}apt-app01"
   location            = azurerm_resource_group.newproj-rg.location
   resource_group_name = azurerm_resource_group.newproj-rg.name
 
@@ -43,7 +43,7 @@ resource "azurerm_network_security_group" "nsg-ppl-uatapt-app01" {
 
 # Network Security Group for Database Subnet
 resource "azurerm_network_security_group" "nsg-ppl-uatdbt-dbs01" {
-  name                = "nsg-ppl-uatdbt-dbs01"
+  name                = "nsg-${var.project_name}-${var.environment}dbt-dbs01"
   location            = azurerm_resource_group.newproj-rg.location
   resource_group_name = azurerm_resource_group.newproj-rg.name
 
@@ -74,7 +74,7 @@ resource "azurerm_network_security_group" "nsg-ppl-uatdbt-dbs01" {
 
 # Network Security Group for Jumphost Subnet
 resource "azurerm_network_security_group" "nsg-ppl-uatmgt-jh01" {
-  name                = "nsg-ppl-uatmgt-jh01"
+  name                = "nsg-${var.project_name}-${var.environment}mgt-jh01"
   location            = azurerm_resource_group.newproj-rg.location
   resource_group_name = azurerm_resource_group.newproj-rg.name
 
@@ -105,7 +105,7 @@ resource "azurerm_network_security_group" "nsg-ppl-uatmgt-jh01" {
 
 # Network Security Group for Application Gateway Subnet
 resource "azurerm_network_security_group" "nsg-ppl-uatweb-apgw01" {
-  name                = "nsg-ppl-uatweb-apgw01"
+  name                = "nsg-${var.project_name}-${var.environment}web-apgw01"
   location            = azurerm_resource_group.newproj-rg.location
   resource_group_name = azurerm_resource_group.newproj-rg.name
 

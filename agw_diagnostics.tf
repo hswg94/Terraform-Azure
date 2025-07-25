@@ -1,6 +1,6 @@
 # Diagnostic Settings for Application Gateway
 resource "azurerm_monitor_diagnostic_setting" "agw-diagnostics" {
-  name               = "apgw-ppl-uatweb-ag-diag01"
+  name               = "apgw-${var.project_name}-${var.environment}web-ag-diag01"
   target_resource_id = azurerm_application_gateway.apgw-ppl-uatweb-ag.id
 
   # Application Gateway Access Log

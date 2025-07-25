@@ -6,7 +6,7 @@ variable "project_name" {
 }
 
 variable "environment" {
-  description = "Environment (uat, prod)"
+  description = "Environment (uat, prd)"
   type        = string
   default     = "uat"
 }
@@ -54,10 +54,10 @@ variable "jumphost_ip" {
   type        = string
   default     = "172.18.132.228/32"
 }
+
 # Bastion subnet CIDR #
 variable "bastion_subnet_cidr" {
   description = "Bastion subnet CIDR"
   type        = string
   default     = "172.18.17.0/26"
 }
-
