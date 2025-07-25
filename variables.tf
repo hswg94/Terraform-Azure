@@ -1,4 +1,11 @@
 #### Project Configuration ####
+# Hostname Configuration for Application Gateway #
+variable "app_hostname" {
+  description = "Application hostname for listeners and redirects"
+  type        = string
+  default     = "invoicenow-ap-uat.anacle.com"
+}
+
 variable "project_name" {
   description = "Project Codename (e.g., ppl, gwc, cdl, etc)"
   type        = string
@@ -12,12 +19,12 @@ variable "environment" {
 }
 
 variable "location" {
-  description = "Azure region"
+  description = "Azure Region"
   type        = string
   default     = "Southeast Asia"
 }
 
-##### Network Configuration #####
+#### Network Configuration ####
 # Vnet Configuration #
 variable "vnet_address_space" {
   description = "VNet address space"
@@ -60,12 +67,4 @@ variable "bastion_subnet_cidr" {
   description = "Bastion subnet CIDR"
   type        = string
   default     = "172.18.17.0/26"
-}
-
-#### Application Gateway Configuration ####
-# Hostname Configuration #
-variable "app_hostname" {
-  description = "Application hostname for listeners and redirects"
-  type        = string
-  default     = "invoicenow-ap-uat.anacle.com"
 }
