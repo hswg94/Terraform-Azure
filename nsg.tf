@@ -1,5 +1,5 @@
 # Network Security Group for Application Subnet
-resource "azurerm_network_security_group" "nsg-ppl-uatapt-app01" {
+resource "azurerm_network_security_group" "nsg-ppl-apt-app01" {
   name                = "nsg-${var.project_name}-${var.environment}apt-app01"
   location            = azurerm_resource_group.newproj-rg.location
   resource_group_name = azurerm_resource_group.newproj-rg.name
@@ -42,7 +42,7 @@ resource "azurerm_network_security_group" "nsg-ppl-uatapt-app01" {
 }
 
 # Network Security Group for Database Subnet
-resource "azurerm_network_security_group" "nsg-ppl-uatdbt-dbs01" {
+resource "azurerm_network_security_group" "nsg-ppl-dbt-dbs01" {
   name                = "nsg-${var.project_name}-${var.environment}dbt-dbs01"
   location            = azurerm_resource_group.newproj-rg.location
   resource_group_name = azurerm_resource_group.newproj-rg.name
@@ -73,7 +73,7 @@ resource "azurerm_network_security_group" "nsg-ppl-uatdbt-dbs01" {
 }
 
 # Network Security Group for Jumphost Subnet
-resource "azurerm_network_security_group" "nsg-ppl-uatmgt-jh01" {
+resource "azurerm_network_security_group" "nsg-ppl-mgt-jh01" {
   name                = "nsg-${var.project_name}-${var.environment}mgt-jh01"
   location            = azurerm_resource_group.newproj-rg.location
   resource_group_name = azurerm_resource_group.newproj-rg.name
@@ -104,7 +104,7 @@ resource "azurerm_network_security_group" "nsg-ppl-uatmgt-jh01" {
 }
 
 # Network Security Group for Application Gateway Subnet
-resource "azurerm_network_security_group" "nsg-ppl-uatweb-apgw01" {
+resource "azurerm_network_security_group" "nsg-ppl-web-apgw01" {
   name                = "nsg-${var.project_name}-${var.environment}web-apgw01"
   location            = azurerm_resource_group.newproj-rg.location
   resource_group_name = azurerm_resource_group.newproj-rg.name
@@ -161,20 +161,20 @@ resource "azurerm_network_security_group" "nsg-ppl-uatweb-apgw01" {
 # Network Security Group Associations
 resource "azurerm_subnet_network_security_group_association" "agw-nsg-association" {
   subnet_id                 = azurerm_subnet.newproj-agw01-subnet.id
-  network_security_group_id = azurerm_network_security_group.nsg-ppl-uatweb-apgw01.id
+  network_security_group_id = azurerm_network_security_group.nsg-ppl-web-apgw01.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "app-nsg-association" {
   subnet_id                 = azurerm_subnet.newproj-app01-subnet.id
-  network_security_group_id = azurerm_network_security_group.nsg-ppl-uatapt-app01.id
+  network_security_group_id = azurerm_network_security_group.nsg-ppl-apt-app01.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "db-nsg-association" {
   subnet_id                 = azurerm_subnet.newproj-db-subnet.id
-  network_security_group_id = azurerm_network_security_group.nsg-ppl-uatdbt-dbs01.id
+  network_security_group_id = azurerm_network_security_group.nsg-ppl-dbt-dbs01.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "jh-nsg-association" {
   subnet_id                 = azurerm_subnet.newproj-jh-subnet.id
-  network_security_group_id = azurerm_network_security_group.nsg-ppl-uatmgt-jh01.id
+  network_security_group_id = azurerm_network_security_group.nsg-ppl-mgt-jh01.id
 }

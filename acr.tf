@@ -1,5 +1,5 @@
 # Azure Container Registry
-resource "azurerm_container_registry" "acrppluat" {
+resource "azurerm_container_registry" "acrppl" {
   name                = "acr${var.project_name}${var.environment}"
   resource_group_name = azurerm_resource_group.newproj-rg.name
   location            = azurerm_resource_group.newproj-rg.location

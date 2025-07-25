@@ -1,4 +1,4 @@
-resource "azurerm_web_application_firewall_policy" "wafp-ppl-uatweb-apgw" {
+resource "azurerm_web_application_firewall_policy" "wafp-ppl-web-apgw" {
   name                = "wafp-${var.project_name}-${var.environment}web-apgw"
   resource_group_name = azurerm_resource_group.newproj-rg.name
   location            = azurerm_resource_group.newproj-rg.location

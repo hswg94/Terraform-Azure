@@ -1,4 +1,4 @@
-resource "azurerm_public_ip" "pip-ppl-uat-apgw01" {
+resource "azurerm_public_ip" "pip-ppl-apgw01" {
   name                = "pip-${var.project_name}-${var.environment}-apgw01"
   resource_group_name = azurerm_resource_group.newproj-rg.name
   location            = azurerm_resource_group.newproj-rg.location
@@ -7,7 +7,7 @@ resource "azurerm_public_ip" "pip-ppl-uat-apgw01" {
   zones               = ["1", "2", "3"]
 }
 
-resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
+resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
   gateway_ip_configuration {
     name      = "appGatewayIpConfig"
     subnet_id = azurerm_subnet.newproj-agw01-subnet.id
@@ -29,7 +29,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     max_capacity = 2
   }
 
-  firewall_policy_id = azurerm_web_application_firewall_policy.wafp-ppl-uatweb-apgw.id
+  firewall_policy_id = azurerm_web_application_firewall_policy.wafp-ppl-web-apgw.id
 
   ssl_policy {
     policy_type          = "CustomV2"
@@ -114,7 +114,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
 
   frontend_ip_configuration {
     name                 = "appGwPublicFrontendIpIPv4"
-    public_ip_address_id = azurerm_public_ip.pip-ppl-uat-apgw01.id
+    public_ip_address_id = azurerm_public_ip.pip-ppl-apgw01.id
   }
 
   //////// FRONTEND PORTS ////////
@@ -152,7 +152,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     frontend_ip_configuration_name = "appGwPublicFrontendIpIPv4"
     protocol                       = "Http"
     frontend_port_name             = "port_80"
-    host_name                      = "invoicenow-ap-uat.anacle.com"
+    host_name                      = var.app_hostname
   }
 
   http_listener {
@@ -160,7 +160,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     frontend_ip_configuration_name = "appGwPublicFrontendIpIPv4"
     protocol                       = "Https"
     frontend_port_name             = "port_443"
-    host_name                      = "invoicenow-ap-uat.anacle.com"
+    host_name                      = var.app_hostname
     ssl_certificate_name           = "wildcard-anacle-com-2024-25"
     require_sni                    = true
   }
@@ -182,7 +182,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     rule_type                   = "Basic"
     http_listener_name          = "http-listener"
     redirect_configuration_name = "http-rule"
-    rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
+    rewrite_rule_set_name       = "rws-${var.project_name}-${var.environment}web-ag-01"
   }
 
   redirect_configuration {
@@ -208,7 +208,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     name                                 = "temp-rule"
     default_backend_address_pool_name    = "empty"
     default_backend_http_settings_name   = "temp-settings"
-    default_rewrite_rule_set_name        = "rws-ppl-uatweb-ag-01"
+    default_rewrite_rule_set_name        = "rws-${var.project_name}-${var.environment}web-ag-01"
 
     path_rule {
       paths                      = ["/admin"]
@@ -221,7 +221,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   redirect_configuration {
     name                 = "https-rule_redirect"
     redirect_type        = "Permanent"
-    target_url           = "https://invoicenow-ap-uat.anacle.com/as4"
+    target_url           = "https://${var.app_hostname}/as4"
     include_path         = true
     include_query_string = true
   }
@@ -229,7 +229,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   redirect_configuration {
     name                 = "https-rule_redirect-status"
     redirect_type        = "Permanent"
-    target_url           = "https://invoicenow-ap-uat.anacle.com/as4"
+    target_url           = "https://${var.app_hostname}/as4"
     include_path         = false
     include_query_string = false
   }
@@ -237,7 +237,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   redirect_configuration {
     name                 = "https-rule_redirect-as4"
     redirect_type        = "Permanent"
-    target_url           = "https://invoicenow-ap-uat.anacle.com/as4"
+    target_url           = "https://${var.app_hostname}/as4"
     include_path         = false
     include_query_string = false
   }
@@ -245,7 +245,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   redirect_configuration {
     name                 = "https-rule_redirect-as4-status"
     redirect_type        = "Permanent"
-    target_url           = "https://invoicenow-ap-uat.anacle.com/as4"
+    target_url           = "https://${var.app_hostname}/as4"
     include_path         = false
     include_query_string = false
   }
@@ -253,7 +253,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   redirect_configuration {
     name                 = "https-rule"
     redirect_type        = "Permanent"
-    target_url           = "https://invoicenow-ap-uat.anacle.com/admin"
+    target_url           = "https://${var.app_hostname}/admin"
     include_path         = true
     include_query_string = true
   }
@@ -273,14 +273,14 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
   url_path_map {
     name                                 = "https-rule"
     default_redirect_configuration_name = "https-rule"
-    default_rewrite_rule_set_name        = "rws-ppl-uatweb-ag-01"
+    default_rewrite_rule_set_name        = "rws-${var.project_name}-${var.environment}web-ag-01"
 
     path_rule {
       paths                      = ["/sendapi/*"]
       name                       = "sendapi"
       backend_http_settings_name = "sendapi-backendsettings"
       backend_address_pool_name  = "simplicity-app"
-      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
+      rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
     }
 
     path_rule {
@@ -288,21 +288,21 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
       name                       = "admin"
       backend_http_settings_name = "admin-backendsettings"
       backend_address_pool_name  = "simplicity-app"
-      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
+      rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
     }
 
     path_rule {
       paths                       = ["/as4/"]
       name                        = "redirect-as4"
       redirect_configuration_name = "https-rule_redirect-as4"
-      rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
+      rewrite_rule_set_name       = "rws-${var.project_name}-${var.environment}web-ag-01"
     }
 
     path_rule {
       paths                       = ["/as4/status*"]
       name                        = "redirect-as4-status"
       redirect_configuration_name = "https-rule_redirect-as4-status"
-      rewrite_rule_set_name       = "rws-ppl-uatweb-ag-01"
+      rewrite_rule_set_name       = "rws-${var.project_name}-${var.environment}web-ag-01"
     }
 
     path_rule {
@@ -310,7 +310,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
       name                       = "oxalis"
       backend_http_settings_name = "as4-backendsettings"
       backend_address_pool_name  = "simplicity-app"
-      rewrite_rule_set_name      = "rws-ppl-uatweb-ag-01"
+      rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
     }
   }
   /* END OF TEMP RULE */
@@ -318,10 +318,10 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
 
   //////// REWRITES ////////
   rewrite_rule_set {
-    name = "rws-ppl-uatweb-ag-01"
+    name = "rws-${var.project_name}-${var.environment}web-ag-01"
 
     rewrite_rule {
-      name          = "ppl-uat-rewrite-01"
+      name          = "${var.project_name}-${var.environment}-rewrite-01"
       rule_sequence = 100
 
       condition {
@@ -336,7 +336,7 @@ resource "azurerm_application_gateway" "apgw-ppl-uatweb-ag" {
     }
 
     rewrite_rule {
-      name          = "ppl-uat-rewrite-02"
+      name          = "${var.project_name}-${var.environment}-rewrite-02"
       rule_sequence = 101
 
       condition {

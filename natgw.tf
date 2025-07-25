@@ -1,5 +1,5 @@
 # Public IP for NAT Gateway
-resource "azurerm_public_ip" "pip-ppl-uat-natgw01" {
+resource "azurerm_public_ip" "pip-ppl-natgw01" {
   name                = "pip-${var.project_name}-${var.environment}-natgw01"
   location            = azurerm_resource_group.newproj-rg.location
   resource_group_name = azurerm_resource_group.newproj-rg.name
@@ -9,7 +9,7 @@ resource "azurerm_public_ip" "pip-ppl-uat-natgw01" {
 }
 
 # NAT Gateway
-resource "azurerm_nat_gateway" "natgw-uat-ppl" {
+resource "azurerm_nat_gateway" "natgw-ppl" {
   name                    = "natgw-${var.environment}-${var.project_name}"
   location                = azurerm_resource_group.newproj-rg.location
   resource_group_name     = azurerm_resource_group.newproj-rg.name
@@ -19,6 +19,6 @@ resource "azurerm_nat_gateway" "natgw-uat-ppl" {
 
 # Associate Public IP with NAT Gateway
 resource "azurerm_nat_gateway_public_ip_association" "natgw-pip-association" {
-  nat_gateway_id       = azurerm_nat_gateway.natgw-uat-ppl.id
-  public_ip_address_id = azurerm_public_ip.pip-ppl-uat-natgw01.id
+  nat_gateway_id       = azurerm_nat_gateway.natgw-ppl.id
+  public_ip_address_id = azurerm_public_ip.pip-ppl-natgw01.id
 }
