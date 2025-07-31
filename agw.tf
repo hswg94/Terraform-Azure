@@ -12,7 +12,6 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
     name      = "appGatewayIpConfig"
     subnet_id = azurerm_subnet.newproj-agw01-subnet.id
   }
-
   name                = "apgw-${var.project_name}-${var.environment}web-ag"
   resource_group_name = azurerm_resource_group.newproj-rg.name
   location            = azurerm_resource_group.newproj-rg.location
@@ -52,58 +51,7 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
     name = "simplicity-app"
   }
 
-  backend_address_pool {
-    name = "empty"
-
-  }
-
   //////// BACKEND SETTINGS ////////
-  backend_http_settings {
-    name                  = "temp-settings"
-    protocol              = "Http"
-    port                  = 80
-    cookie_based_affinity = "Disabled"
-    affinity_cookie_name  = "ApplicationGatewayAffinity"
-    request_timeout = 20
-    # path                                = "/"
-    pick_host_name_from_backend_address = false
-    # probe_name                          = ""
-  }
-
-  backend_http_settings {
-    name                  = "simplicity-settings"
-    protocol              = "Http"
-    port                  = 80
-    cookie_based_affinity = "Disabled"
-    affinity_cookie_name  = "ApplicationGatewayAffinity"
-    request_timeout = 2000
-    # path                                = "/"
-    pick_host_name_from_backend_address = false
-    # probe_name                          = ""
-  }
-
-  backend_http_settings {
-    name                  = "sendapi-backendsettings"
-    protocol              = "Http"
-    port                  = 80
-    cookie_based_affinity = "Disabled"
-    request_timeout = 1200
-    # path                                = "/"
-    pick_host_name_from_backend_address = true
-    probe_name                          = "sendapi-probe"
-  }
-
-  backend_http_settings {
-    name                  = "as4-backendsettings"
-    protocol              = "Http"
-    port                  = 8080
-    cookie_based_affinity = "Disabled"
-    request_timeout = 1200
-    # path                                = "/"
-    pick_host_name_from_backend_address = true
-    probe_name                          = "as4-probe"
-  }
-
   backend_http_settings {
     name                  = "admin-backendsettings"
     protocol              = "Http"
@@ -111,9 +59,18 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
     cookie_based_affinity = "Enabled"
     affinity_cookie_name  = "ApplicationGatewayAffinity"
     request_timeout = 1200
-    # path                                = "/"
     pick_host_name_from_backend_address = true
     probe_name                          = "admin-probe"
+  }
+
+  backend_http_settings {
+    name                  = "toapi-backendsettings"
+    protocol              = "Http"
+    port                  = 80
+    cookie_based_affinity = "Disabled"
+    request_timeout = 1200
+    pick_host_name_from_backend_address = true
+    probe_name                          = "health-probe"
   }
 
   //////// END OF BACKEND SETTINGS ////////
@@ -134,10 +91,6 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
     port = 443
   }
 
-  frontend_port {
-    name = "port_8008"
-    port = 8008
-  }
   //////// END OF FRONTEND PORTS ////////
 
   //////// SSL CERTIFICATES ////////
@@ -164,13 +117,6 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
     host_name                      = var.app_hostname
     ssl_certificate_name           = var.ssl_certificate_name
     require_sni                    = true
-  }
-
-  http_listener {
-    name                           = "temp-listener"
-    frontend_ip_configuration_name = "appGwPublicFrontendIpIPv4"
-    protocol                       = "Http"
-    frontend_port_name             = "port_8008"
   }
 
   //////// END OF LISTENERS ////////
@@ -206,71 +152,9 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
   }
 
   url_path_map {
-    name                                 = "temp-rule"
-    default_backend_address_pool_name    = "empty"
-    default_backend_http_settings_name   = "temp-settings"
-    default_rewrite_rule_set_name        = "rws-${var.project_name}-${var.environment}web-ag-01"
-
-    path_rule {
-      paths                      = ["/admin"]
-      name                       = "admin-page"
-      backend_http_settings_name = "temp-settings"
-      backend_address_pool_name  = "empty"
-    }
-  }
-
-  redirect_configuration {
-    name                 = "https-rule_redirect"
-    redirect_type        = "Permanent"
-    target_url           = "https://${var.app_hostname}/as4"
-    include_path         = true
-    include_query_string = true
-  }
-
-  redirect_configuration {
-    name                 = "https-rule_redirect-status"
-    redirect_type        = "Permanent"
-    target_url           = "https://${var.app_hostname}/as4"
-    include_path         = false
-    include_query_string = false
-  }
-
-  redirect_configuration {
-    name                 = "https-rule_redirect-as4"
-    redirect_type        = "Permanent"
-    target_url           = "https://${var.app_hostname}/as4"
-    include_path         = false
-    include_query_string = false
-  }
-
-  redirect_configuration {
-    name                 = "https-rule_redirect-as4-status"
-    redirect_type        = "Permanent"
-    target_url           = "https://${var.app_hostname}/as4"
-    include_path         = false
-    include_query_string = false
-  }
-
-  redirect_configuration {
-    name                 = "https-rule"
-    redirect_type        = "Permanent"
-    target_url           = "https://${var.app_hostname}/admin"
-    include_path         = true
-    include_query_string = true
-  }
-
-  url_path_map {
     name                                 = "https-rule"
     default_redirect_configuration_name = "https-rule"
     default_rewrite_rule_set_name        = "rws-${var.project_name}-${var.environment}web-ag-01"
-
-    path_rule {
-      paths                      = ["/sendapi/*"]
-      name                       = "sendapi"
-      backend_http_settings_name = "sendapi-backendsettings"
-      backend_address_pool_name  = "simplicity-app"
-      rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
-    }
 
     path_rule {
       paths                      = ["/admin/*"]
@@ -281,41 +165,17 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
     }
 
     path_rule {
-      paths                       = ["/as4/"]
-      name                        = "redirect-as4"
-      redirect_configuration_name = "https-rule_redirect-as4"
-      rewrite_rule_set_name       = "rws-${var.project_name}-${var.environment}web-ag-01"
-    }
-
-    path_rule {
-      paths                       = ["/as4/status*"]
-      name                        = "redirect-as4-status"
-      redirect_configuration_name = "https-rule_redirect-as4-status"
-      rewrite_rule_set_name       = "rws-${var.project_name}-${var.environment}web-ag-01"
-    }
-
-    path_rule {
-      paths                      = ["/as4*"]
-      name                       = "oxalis"
-      backend_http_settings_name = "as4-backendsettings"
+      paths                      = ["/*"]
+      name                       = "toapi"
+      backend_http_settings_name = "toapi-backendsettings"
       backend_address_pool_name  = "simplicity-app"
       rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
     }
+
   }
 
   /* END OF HTTPS RULE */
 
-  /* TEMP RULE */
-
-  request_routing_rule {
-    name               = "temp-rule"
-    priority           = 5000
-    http_listener_name = "temp-listener"
-    rule_type          = "PathBasedRouting"
-    url_path_map_name  = "temp-rule"
-  }
-
-  /* END OF TEMP RULE */
   //////// END OF ROUTING RULES ////////
 
   //////// REWRITES ////////
@@ -358,7 +218,7 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
   probe {
     name                                      = "admin-probe"
     protocol                                  = "Http"
-    path                                      = "/admin"
+    path                                      = "/admin/health"
     interval                                  = 30
     timeout                                   = 30
     unhealthy_threshold                       = 3
@@ -371,35 +231,18 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
   }
 
   probe {
-    name                                      = "sendapi-probe"
+    name                                      = "health-probe"
     protocol                                  = "Http"
-    path                                      = "/sendapi"
+    path                                      = "/health"
     interval                                  = 30
     timeout                                   = 30
     unhealthy_threshold                       = 3
     pick_host_name_from_backend_http_settings = true
     minimum_servers                           = 0
-
-    match {
-      status_code = ["200-499"]
-      body        = ""
-    }
-  }
-
-  probe {
-    name                                      = "as4-probe"
-    protocol                                  = "Http"
-    path                                      = "/as4"
-    interval                                  = 30
-    timeout                                   = 30
-    unhealthy_threshold                       = 3
-    pick_host_name_from_backend_http_settings = true
-    minimum_servers                           = 0
-
     match {
       status_code = ["200-399"]
       body        = ""
     }
   }
-    //////// END OF HEALTH PROBES ////////
+  //////// END OF HEALTH PROBES ////////
 }
