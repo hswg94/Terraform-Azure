@@ -19,6 +19,12 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
   enable_http2        = true
   zones               = ["1", "2", "3"]
 
+  # Assign managed identity for Key Vault access
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.agw-identity.id]
+  }
+
   sku {
     name = "WAF_v2"
     tier = "WAF_v2"
@@ -135,16 +141,11 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
   //////// END OF FRONTEND PORTS ////////
 
   //////// SSL CERTIFICATES ////////
-  # SSL certificate managed outside of Terraform to avoid sensitive data handling
-  # ssl_certificate {
-  #   name     = "wildcard-anacle-com-2024-25"
-  #   # Certificate data managed externally
-  # }
-  //////// END OF SSL CERTIFICATES ////////
-
-  lifecycle {
-    ignore_changes = [ssl_certificate]
+  ssl_certificate {
+    name                = var.ssl_certificate_name
+    key_vault_secret_id = azurerm_key_vault_certificate.ssl-certificate.secret_id
   }
+  //////// END OF SSL CERTIFICATES ////////
 
   //////// LISTENERS ////////
   http_listener {
@@ -161,7 +162,7 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
     protocol                       = "Https"
     frontend_port_name             = "port_443"
     host_name                      = var.app_hostname
-    ssl_certificate_name           = "wildcard-anacle-com-2024-25"
+    ssl_certificate_name           = var.ssl_certificate_name
     require_sni                    = true
   }
 
