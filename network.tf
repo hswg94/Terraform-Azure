@@ -6,7 +6,7 @@ resource "azurerm_resource_group" "newproj-rg" {
 
 # Virtual Network
 resource "azurerm_virtual_network" "newproj-vnet" {
-  name                = "vnet-${var.environment}-${var.project_name}"
+  name                = "vnet-${var.project_name}-${var.environment}"
   resource_group_name = azurerm_resource_group.newproj-rg.name
   location            = azurerm_resource_group.newproj-rg.location
   address_space       = var.vnet_address_space
