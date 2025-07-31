@@ -1,4 +1,4 @@
-- Virtual Network with 4 subnets
+- Virtual Network with 4 Subnets
 - Application Gateway with WAF
 - Network Security Groups
 - Container Registry
