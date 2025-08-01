@@ -49,6 +49,10 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
 
   backend_address_pool {
     name = "simplicity-app"
+    ip_addresses = [
+      azurerm_network_interface.vm1-nic.private_ip_address,
+      azurerm_network_interface.vm2-nic.private_ip_address
+    ]
   }
 
   //////// BACKEND SETTINGS ////////
@@ -153,7 +157,8 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
 
   url_path_map {
     name                                 = "https-rule"
-    default_redirect_configuration_name = "https-rule"
+    default_backend_address_pool_name    = "simplicity-app"
+    default_backend_http_settings_name   = "toapi-backendsettings"
     default_rewrite_rule_set_name        = "rws-${var.project_name}-${var.environment}web-ag-01"
 
     path_rule {
@@ -163,7 +168,6 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
       backend_address_pool_name  = "simplicity-app"
       rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
     }
-
     path_rule {
       paths                      = ["/*"]
       name                       = "toapi"
@@ -171,7 +175,6 @@ resource "azurerm_application_gateway" "apgw-ppl-web-ag" {
       backend_address_pool_name  = "simplicity-app"
       rewrite_rule_set_name      = "rws-${var.project_name}-${var.environment}web-ag-01"
     }
-
   }
 
   /* END OF HTTPS RULE */
