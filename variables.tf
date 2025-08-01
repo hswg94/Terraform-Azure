@@ -29,7 +29,7 @@ variable "location" {
 variable "vnet_address_space" {
   description = "VNet address space"
   type        = list(string)
-  default     = ["172.18.132.0/24"]
+  default     = ["10.18.0.0/24"]
 }
 
 # Subnet Configuration #
@@ -42,10 +42,10 @@ variable "subnet_cidrs" {
     jh_subnet  = string
   })
   default = {
-    agw_subnet = "172.18.132.0/28"
-    app_subnet = "172.18.132.16/28"
-    db_subnet  = "172.18.132.48/28"
-    jh_subnet  = "172.18.132.224/28"
+    agw_subnet = "10.18.0.0/28"
+    app_subnet = "10.18.0.16/28"
+    db_subnet  = "10.18.0.48/28"
+    jh_subnet  = "10.18.0.224/28"
   }
 }
 
@@ -57,18 +57,25 @@ variable "dns_servers" {
 }
 
 #### Jumphost and Bastion Configuration ####
-# Jumphost IP #
+# Jumphost IP (for NSG rules - with CIDR notation) #
 variable "jumphost_ip" {
-  description = "Jumphost IP address"
+  description = "Jumphost IP address with CIDR for NSG rules"
   type        = string
-  default     = "172.18.132.228/32"
+  default     = "10.18.0.228/32"
+}
+
+# Jumphost Private IP (actual IP without CIDR) #
+variable "jumphost_private_ip" {
+  description = "Jumphost private IP address"
+  type        = string
+  default     = "10.18.0.228"
 }
 
 # Bastion subnet CIDR #
 variable "bastion_subnet_cidr" {
   description = "Bastion subnet CIDR"
   type        = string
-  default     = "172.18.17.0/26"
+  default     = "10.18.0.0/26"
 }
 
 #### SSL Certificate Configuration ####
@@ -84,4 +91,25 @@ variable "ssl_certificate_password" {
   type        = string
   default     = "Password123!"
   sensitive   = true
+}
+
+#### Virtual Machine Configuration ####
+variable "vm_ssh_public_key" {
+  description = "SSH public key for VM access"
+  type        = string
+  default     = ""  # Will be set via tfvars or file function in locals
+}
+
+# VM1 Private IP #
+variable "vm1_private_ip" {
+  description = "Private IP address for VM1"
+  type        = string
+  default     = "10.18.0.20"
+}
+
+# VM2 Private IP #
+variable "vm2_private_ip" {
+  description = "Private IP address for VM2"
+  type        = string
+  default     = "10.18.0.21"
 }
