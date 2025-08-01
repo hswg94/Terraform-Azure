@@ -5,7 +5,7 @@ resource "azurerm_network_security_group" "nsg-apt-app01" {
   resource_group_name = azurerm_resource_group.newproj-rg.name
 
   security_rule {
-    name                       = "AllowJumphostInBound"
+    name                       = "AllowJumphostTcpInBound"
     priority                   = 1000
     direction                  = "Inbound"
     access                     = "Allow"
@@ -13,7 +13,19 @@ resource "azurerm_network_security_group" "nsg-apt-app01" {
     source_port_range          = "*"
     source_address_prefix      = var.jumphost_ip
     destination_address_prefix = azurerm_subnet.newproj-app01-subnet.address_prefixes[0]
-    destination_port_ranges    = ["3389", "22"]
+    destination_port_ranges    = ["22", "80", "443", "3389"]
+  }
+
+  security_rule {
+    name                       = "AllowJumphostIcmpInBound"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Icmp"
+    source_port_range          = "*"
+    source_address_prefix      = var.jumphost_ip
+    destination_address_prefix = azurerm_subnet.newproj-app01-subnet.address_prefixes[0]
+    destination_port_range     = "*"
   }
 
   security_rule {
@@ -79,8 +91,20 @@ resource "azurerm_network_security_group" "nsg-mgt-jh01" {
   resource_group_name = azurerm_resource_group.newproj-rg.name
 
   security_rule {
-    name                       = "AllowBastionInBound"
+    name                       = "AllowSSHInBound"
     priority                   = 1000
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = var.jumphost_ip
+    destination_port_range     = "22"
+  }
+
+  security_rule {
+    name                       = "AllowBastionInBound"
+    priority                   = 1010
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
