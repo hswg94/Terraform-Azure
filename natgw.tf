@@ -22,3 +22,9 @@ resource "azurerm_nat_gateway_public_ip_association" "natgw-pip-association" {
   nat_gateway_id       = azurerm_nat_gateway.natgw.id
   public_ip_address_id = azurerm_public_ip.pip-natgw01.id
 }
+
+# Associate NAT Gateway with Application Subnet
+resource "azurerm_subnet_nat_gateway_association" "app-subnet-natgw" {
+  subnet_id      = azurerm_subnet.newproj-app01-subnet.id
+  nat_gateway_id = azurerm_nat_gateway.natgw.id
+}
