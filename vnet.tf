@@ -10,7 +10,8 @@ resource "azurerm_virtual_network" "newproj-vnet" {
   resource_group_name = azurerm_resource_group.newproj-rg.name
   location            = azurerm_resource_group.newproj-rg.location
   address_space       = var.vnet_address_space
-  # dns_servers         = var.dns_servers
+  # Use DNS servers only in production environment
+  dns_servers         = var.environment == "production" ? var.dns_servers : null
 }
 
 # Application Gateway subnet
