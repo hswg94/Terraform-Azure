@@ -18,6 +18,20 @@ crash.log
 # Exclude backup files
 *.bak
 
+# SSH Keys - Never commit private keys!
+terraform_azure_key
+terraform_azure_key.pub
+*.pem
+*.key
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
 # Ignore other sensitive files
 *.zip
 *.docx
