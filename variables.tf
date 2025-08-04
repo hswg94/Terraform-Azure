@@ -1,9 +1,8 @@
-#### Project Configuration ####
-# Hostname Configuration for Application Gateway #
-variable "app_hostname" {
-  description = "Application hostname for listeners and redirects"
+#### Default Project configuration ####
+variable "location" {
+  description = "Azure Region"
   type        = string
-  default     = "test123-ap-uat.anacle.com"
+  default     = "Southeast Asia"
 }
 
 variable "project_name" {
@@ -12,16 +11,19 @@ variable "project_name" {
   default     = "williamtest"
 }
 
+
+// override these in prod.tfvars
 variable "environment" {
   description = "Environment (uat, prd)"
   type        = string
   default     = "uat"
 }
 
-variable "location" {
-  description = "Azure Region"
+# Hostname Configuration for Application Gateway #
+variable "app_hostname" {
+  description = "Application hostname for listeners and redirects"
   type        = string
-  default     = "Southeast Asia"
+  default     = "test123-ap-uat.anacle.com"
 }
 
 #### Network Configuration ####
@@ -51,9 +53,9 @@ variable "subnet_cidrs" {
 
 # DNS Configuration #
 variable "dns_servers" {
-  description = "DNS servers for the VNet"
+  description = "DNS servers for the VNet (only used in production)"
   type        = list(string)
-  default     = ["172.18.17.68", "172.18.17.69"]
+  default     = null  # Will be set conditionally based on environment
 }
 
 #### Jumphost and Bastion Configuration ####
@@ -82,7 +84,7 @@ variable "bastion_subnet_cidr" {
 variable "ssl_certificate_name" {
   description = "Name of the SSL certificate"
   type        = string
-  default     = "test-certificate-123"
+  default     = "ssl-cert"  # Static value only - will be prefixed with project-environment in locals
 }
 
 #### SSL Certificate Configuration ####
@@ -97,7 +99,7 @@ variable "ssl_certificate_password" {
 variable "vm_ssh_public_key" {
   description = "SSH public key for VM access"
   type        = string
-  default     = ""  # Will be set via tfvars or file function in locals
+  default     = ""  # Will be set via file function in locals
 }
 
 # VM1 Private IP #

@@ -1,5 +1,10 @@
 # Jumphost VM for SSH access to private VMs
 
+# Local values for SSH key handling
+locals {
+  ssh_public_key = var.vm_ssh_public_key != "" ? var.vm_ssh_public_key : file("${path.module}/terraform_azure_key.pub")
+}
+
 resource "azurerm_public_ip" "jumphost-pip" {
   name                = "pip-${var.project_name}-${var.environment}-jumphost"
   resource_group_name = azurerm_resource_group.newproj-rg.name
@@ -29,7 +34,7 @@ resource "azurerm_linux_virtual_machine" "jumphost" {
   resource_group_name = azurerm_resource_group.newproj-rg.name
   size                = "Standard_B1s"
   admin_username      = "azureuser"
-  
+
   disable_password_authentication = true
 
   network_interface_ids = [
