@@ -59,18 +59,7 @@ resource "azurerm_linux_virtual_machine" "jumphost" {
   }
 
   # Install SSH client and tools
-  custom_data = base64encode(<<-EOF
-#!/bin/bash
-apt-get update
-apt-get install -y openssh-client curl wget htop
-
-# Create a welcome message
-echo "Welcome to Jumphost VM" > /etc/motd
-echo "Use this server to SSH into private VMs:" >> /etc/motd
-echo "VM1: ssh azureuser@10.18.0.20" >> /etc/motd
-echo "VM2: ssh azureuser@10.18.0.21" >> /etc/motd
-EOF
-  )
+  custom_data = base64encode(file("${path.module}/custom_data/jh-setup.sh"))
 
   tags = {
     Environment = var.environment
